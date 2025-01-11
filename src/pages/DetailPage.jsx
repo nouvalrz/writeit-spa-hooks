@@ -4,6 +4,7 @@ import NoteCard from '../components/notes/NoteCard';
 import autoBind from 'auto-bind';
 import FloatingNavigation from '../components/FloatingNavigation';
 import PropTypes from 'prop-types';
+import ThemeContext from '../contexts/ThemeContext';
 import {
   archiveNote,
   deleteNote,
@@ -13,6 +14,7 @@ import {
 import { ClipLoader } from 'react-spinners';
 import SwalToast from '../utils/swal-toast';
 import withReactContent from 'sweetalert2-react-content';
+import LocaleContext from '../contexts/LocaleContext';
 
 function DetailPageWrapper() {
   const { id } = useParams();
@@ -21,6 +23,8 @@ function DetailPageWrapper() {
 }
 
 class DetailPage extends React.Component {
+  static contextType = LocaleContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -54,7 +58,10 @@ class DetailPage extends React.Component {
     } else {
       this.props.navigate('/');
       this.swalAlert.fire({
-        title: 'Successfully delete note',
+        title:
+          this.context.locale === 'en'
+            ? 'Successfully delete note'
+            : 'Berhasil menghapus catatan',
         icon: 'success',
       });
     }
@@ -74,13 +81,19 @@ class DetailPage extends React.Component {
       if (this.state.note.archived) {
         this.props.navigate('/');
         this.swalAlert.fire({
-          title: 'Successfully unarchive note',
+          title:
+            this.context.locale === 'en'
+              ? 'Successfully unarchive note'
+              : 'Berhasil mengembalikan catatan',
           icon: 'success',
         });
       } else {
         this.props.navigate('/archive');
         this.swalAlert.fire({
-          title: 'Successfully archive note',
+          title:
+            this.context.locale === 'en'
+              ? 'Successfully archive note'
+              : 'Berhasil mengarsip catatan',
           icon: 'success',
         });
       }
@@ -98,7 +111,13 @@ class DetailPage extends React.Component {
 
   render() {
     if (!this.state.note) {
-      return <ClipLoader color="white" />;
+      return (
+        <ThemeContext.Consumer>
+          {({ theme }) => (
+            <ClipLoader color={theme === 'dark' ? 'white' : 'black'} />
+          )}
+        </ThemeContext.Consumer>
+      );
     }
 
     return (
@@ -111,28 +130,41 @@ class DetailPage extends React.Component {
           />
         </div>
         {!this.state.isPageLoading && (
-          <FloatingNavigation
-            items={[
-              {
-                title: 'Home',
-                onClick: '/',
-                icon: 'fa-solid fa-house',
-              },
-              {
-                title: this.state.note.archived ? 'Unarchive' : 'Archive',
-                onClick: () =>
-                  this.onToggleArchiveNoteHandler(this.state.note.id),
-                icon: 'fa-regular fa-folder-open',
-                isLoading: this.state.isArchiveLoading,
-              },
-              {
-                title: 'Delete',
-                onClick: () => this.onDeleteNoteHandler(this.state.note.id),
-                icon: 'fa-solid fa-trash-can',
-                isLoading: this.state.isDeleteLoading,
-              },
-            ]}
-          />
+          <LocaleContext.Consumer>
+            {({ locale }) => {
+              return (
+                <FloatingNavigation
+                  items={[
+                    {
+                      title: locale === 'en' ? 'Home' : 'Beranda',
+                      onClick: '/',
+                      icon: 'fa-solid fa-house',
+                    },
+                    {
+                      title: this.state.note.archived
+                        ? locale === 'en'
+                          ? 'Unarchive'
+                          : 'Kembalikan'
+                        : locale === 'en'
+                        ? 'Archive'
+                        : 'Arsipkan',
+                      onClick: () =>
+                        this.onToggleArchiveNoteHandler(this.state.note.id),
+                      icon: 'fa-regular fa-folder-open',
+                      isLoading: this.state.isArchiveLoading,
+                    },
+                    {
+                      title: locale === 'en' ? 'Delete' : 'Hapus',
+                      onClick: () =>
+                        this.onDeleteNoteHandler(this.state.note.id),
+                      icon: 'fa-solid fa-trash-can',
+                      isLoading: this.state.isDeleteLoading,
+                    },
+                  ]}
+                />
+              );
+            }}
+          </LocaleContext.Consumer>
         )}
       </>
     );

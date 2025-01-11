@@ -16,6 +16,7 @@ import {
 } from '../utils/remote-api';
 import SwalToast from '../utils/swal-toast';
 import withReactContent from 'sweetalert2-react-content';
+import LocaleContext from '../contexts/LocaleContext';
 
 function HomePageWrapper({ archive = false }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,6 +37,7 @@ function HomePageWrapper({ archive = false }) {
 }
 
 class HomePage extends React.Component {
+  static contextType = LocaleContext;
   constructor(props) {
     super(props);
 
@@ -71,7 +73,10 @@ class HomePage extends React.Component {
     } else {
       await this._getNotes();
       this.swalAlert.fire({
-        title: 'Successfully delete note',
+        title:
+          this.context.locale === 'en'
+            ? 'Successfully delete note'
+            : 'Berhasil menghapus catatan',
         icon: 'success',
       });
     }
@@ -100,7 +105,10 @@ class HomePage extends React.Component {
     } else {
       await this._getNotes();
       this.swalAlert.fire({
-        title: `Successfully ${note.archive ? 'unarchive' : 'archive'} note`,
+        title: `${this.context.locale === 'en' ? 'Successfully' : 'Berhasil'} ${
+          note.archive ? 'unarchive' : 'archive'
+        } note`,
+
         icon: 'success',
       });
     }
@@ -112,7 +120,7 @@ class HomePage extends React.Component {
       : await getActiveNotes();
 
     if (error) {
-      this.swalAlert.fire({ title: 'Something went wrong', icon: 'error' });
+      this.swalAlert.fire({ title: data.message, icon: 'error' });
     } else {
       this.setState(() => {
         return {
@@ -151,26 +159,32 @@ class HomePage extends React.Component {
         />
 
         <img src={CircleGradient} className="circle-gradient" />
-        <FloatingNavigation
-          items={[
-            !this.props.archive
-              ? {
-                  title: 'Archive',
-                  onClick: '/archive',
-                  icon: 'fa-regular fa-folder-open',
-                }
-              : {
-                  title: 'Home',
-                  onClick: '/',
-                  icon: 'fa-solid fa-house',
-                },
-            {
-              title: 'Add Note',
-              onClick: '/new',
-              icon: 'fa-solid fa-square-plus',
-            },
-          ]}
-        />
+        <LocaleContext.Consumer>
+          {({ locale }) => {
+            return (
+              <FloatingNavigation
+                items={[
+                  !this.props.archive
+                    ? {
+                        title: locale === 'en' ? 'Archive' : 'Arsip',
+                        onClick: '/archive',
+                        icon: 'fa-regular fa-folder-open',
+                      }
+                    : {
+                        title: locale === 'en' ? 'Home' : 'Beranda',
+                        onClick: '/',
+                        icon: 'fa-solid fa-house',
+                      },
+                  {
+                    title: locale === 'en' ? 'Add Note' : 'Tambah',
+                    onClick: '/new',
+                    icon: 'fa-solid fa-square-plus',
+                  },
+                ]}
+              />
+            );
+          }}
+        </LocaleContext.Consumer>
       </>
     );
   }

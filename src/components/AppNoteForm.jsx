@@ -6,8 +6,11 @@ import autoBind from 'auto-bind';
 import PropTypes from 'prop-types';
 import SwalToast from '../utils/swal-toast';
 import withReactContent from 'sweetalert2-react-content';
+import LocaleContext from '../contexts/LocaleContext';
 
 class AppNoteForm extends React.Component {
+  static contextType = LocaleContext;
+
   constructor(props) {
     super(props);
 
@@ -47,7 +50,11 @@ class AppNoteForm extends React.Component {
     event.preventDefault();
 
     if (this.state.body === '' || this.state.title === '') {
-      this.swalAlert.fire({ title: 'Fill all input', icon: 'warning' });
+      this.swalAlert.fire({
+        title:
+          this.context.locale === 'en' ? 'Fill all input' : 'Isi semua input',
+        icon: 'warning',
+      });
       return;
     }
 
@@ -64,35 +71,52 @@ class AppNoteForm extends React.Component {
 
   render() {
     return (
-      <div className="app-note-form">
-        <h1>What’s on your mind?</h1>
-        <p>Write it down here.</p>
-        <form onSubmit={this.onAddNoteHandler} className="app-note-form__form">
-          <TextInput
-            onChange={this.onTitleChangeHandler}
-            label="Title"
-            type="text"
-            className="app-note-form__input"
-            value={this.state.title}
-          />
-          <p className="app-note-form__title-length">
-            {this.state.title.length}/50
-          </p>
-          <TextArea
-            onChange={this.onBodyChangeHandler}
-            label="Body"
-            rows={10}
-            className="app-note-form__input"
-            value={this.state.body}
-          />
-          <Button
-            title="Save"
-            type="submit"
-            className="app-note-form__button"
-            isLoading={this.props.isLoading}
-          />
-        </form>
-      </div>
+      <LocaleContext.Consumer>
+        {({ locale }) => {
+          return (
+            <div className="app-note-form">
+              <h1>
+                {locale === 'en'
+                  ? 'What’s on your mind?'
+                  : 'Apa yang sedang kamu pikirkan?'}
+              </h1>
+              <p>
+                {locale === 'en'
+                  ? 'Write it down here.'
+                  : 'Tuliskan di bawah ini.'}
+              </p>
+              <form
+                onSubmit={this.onAddNoteHandler}
+                className="app-note-form__form"
+              >
+                <TextInput
+                  onChange={this.onTitleChangeHandler}
+                  label={locale === 'en' ? 'Title' : 'Judul'}
+                  type="text"
+                  className="app-note-form__input"
+                  value={this.state.title}
+                />
+                <p className="app-note-form__title-length">
+                  {this.state.title.length}/50
+                </p>
+                <TextArea
+                  onChange={this.onBodyChangeHandler}
+                  label={locale === 'en' ? 'Description' : 'Deskripsi'}
+                  rows={10}
+                  className="app-note-form__input"
+                  value={this.state.body}
+                />
+                <Button
+                  title={locale === 'en' ? 'Save' : 'Simpan'}
+                  type="submit"
+                  className="app-note-form__button"
+                  isLoading={this.props.isLoading}
+                />
+              </form>
+            </div>
+          );
+        }}
+      </LocaleContext.Consumer>
     );
   }
 }

@@ -5,7 +5,9 @@ import useInput from '../hooks/useInput';
 import SwalToast from '../utils/swal-toast';
 import withReactContent from 'sweetalert2-react-content';
 import { register } from '../utils/remote-api';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import AuthHeader from '../components/auth/AuthHeader';
+import LocaleContext from '../contexts/LocaleContext';
 
 function RegisterPage() {
   const [name, changeName] = useInput('');
@@ -13,6 +15,7 @@ function RegisterPage() {
   const [password, changePassword] = useInput('');
   const [passwordConfirmation, changePasswordConfirmation] = useInput('');
   const [buttonLoading, setButtonLoading] = useState(false);
+  const { locale } = useContext(LocaleContext);
   const swalAlert = withReactContent(SwalToast);
   const navigate = useNavigate();
 
@@ -24,18 +27,28 @@ function RegisterPage() {
       password === '' ||
       passwordConfirmation === ''
     ) {
-      swalAlert.fire({ title: 'Fill all inputs', icon: 'warning' });
+      swalAlert.fire({
+        title: locale === 'en' ? 'Fill all inputs' : 'Isi semua input',
+        icon: 'warning',
+      });
       return;
     }
 
     if (passwordConfirmation !== password) {
-      swalAlert.fire({ title: 'Passwords are not same', icon: 'warning' });
+      swalAlert.fire({
+        title:
+          locale === 'en' ? 'Passwords are not same' : 'Kata sandi tidak sama',
+        icon: 'warning',
+      });
       return;
     }
 
     if (password.length < 6) {
       swalAlert.fire({
-        title: 'Minimum password character are 6',
+        title:
+          locale === 'en'
+            ? 'Minimum password character are 6'
+            : 'Minimal karakter password adalah 6',
         icon: 'warning',
       });
       return;
@@ -46,7 +59,13 @@ function RegisterPage() {
 
     if (!error) {
       setButtonLoading(false);
-      swalAlert.fire({ title: 'Berhasil mendafarkan akun', icon: 'success' });
+      swalAlert.fire({
+        title:
+          locale === 'id'
+            ? 'Berhasil mendafarkan akun'
+            : 'Successfully register an account',
+        icon: 'success',
+      });
       navigate('/');
     } else {
       setButtonLoading(false);
@@ -58,20 +77,28 @@ function RegisterPage() {
   return (
     <div className="login-page">
       <div className="auth-card">
-        <div className="auth-card__header">
-          <h1>Daftarkan Dirimu di Write It</h1>
-          <p>Masukan informasi yang benar</p>
+        <AuthHeader>
+          <h1 style={{ marginTop: '0.5rem' }}>
+            {locale === 'id'
+              ? 'Daftarkan Dirimu di Write It'
+              : 'Register Yourself in Write It'}
+          </h1>
+          <p>
+            {locale === 'id'
+              ? 'Masukan informasi yang benar'
+              : 'Fill the information correctly'}
+          </p>
           <p className="auth-card__header-bottom">
-            Sudah memiliki akun?{' '}
+            {locale === 'id' ? 'Sudah memiliki akun?' : 'Already have account?'}{' '}
             <Link to={'/'}>
-              <u>Login Akun</u>
+              <u>{locale === 'id' ? 'Masuk' : 'Login'}</u>
             </Link>
           </p>
-        </div>
+        </AuthHeader>
         <div className="auth-card__body">
           <form onSubmit={onRegister} className="auth-form">
             <TextInput
-              label={'Nama'}
+              label={locale === 'id' ? 'Nama' : 'Name'}
               type={'text'}
               value={name}
               onChange={changeName}
@@ -83,13 +110,17 @@ function RegisterPage() {
               onChange={changeEmail}
             />
             <TextInput
-              label={'Password'}
+              label={locale === 'id' ? 'Kata sandi' : 'Password'}
               type={'password'}
               value={password}
               onChange={changePassword}
             />
             <TextInput
-              label={'Confirmation Password'}
+              label={
+                locale === 'id'
+                  ? 'Konfirmasi kata sandi'
+                  : 'Password confirmation'
+              }
               type={'password'}
               value={passwordConfirmation}
               onChange={changePasswordConfirmation}
@@ -97,7 +128,7 @@ function RegisterPage() {
             <Button
               className="app-button"
               type={'submit'}
-              title={'Login'}
+              title={locale === 'id' ? 'Daftar' : 'Register'}
               isLoading={buttonLoading}
             />
           </form>

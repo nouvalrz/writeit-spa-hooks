@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { showFormattedDate } from '../../utils';
 import Button from '../base/Button';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import LocaleContext from '../../contexts/LocaleContext';
 
 function NoteCard({
   id,
@@ -16,6 +17,7 @@ function NoteCard({
 }) {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isArchiveLoading, setIsArchiveLoading] = useState(false);
+  const { locale } = useContext(LocaleContext);
   return (
     <div className="note-card">
       <Link className="note-card__title" to={`/note/${id}`}>
@@ -32,7 +34,15 @@ function NoteCard({
                 onToggleNoteArchive(id);
               }}
               className="note-card_archive-button"
-              title={archived ? 'Unarchive' : 'Archive'}
+              title={
+                locale === 'en'
+                  ? archived
+                    ? 'Unarchive'
+                    : 'Archive'
+                  : archived
+                  ? 'Kembalikan'
+                  : 'Arsipkan'
+              }
               isLoading={isArchiveLoading}
               loadingColor="white"
             />

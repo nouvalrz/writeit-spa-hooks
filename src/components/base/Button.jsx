@@ -1,4 +1,6 @@
 import { ClipLoader } from 'react-spinners';
+import { useContext } from 'react';
+import ThemeContext from '../../contexts/ThemeContext';
 
 function Button({
   title,
@@ -7,8 +9,8 @@ function Button({
   className,
   onClick,
   isLoading = false,
-  loadingColor = '#141414',
 }) {
+  const { theme } = useContext(ThemeContext);
   return (
     <button
       className={className}
@@ -16,7 +18,10 @@ function Button({
       onClick={isLoading ? null : onClick}
       disabled={isLoading}
     >
-      <ClipLoader loading={isLoading} color={loadingColor} />
+      <ClipLoader
+        loading={isLoading}
+        color={theme === 'dark' ? 'white' : 'black'}
+      />
       {!isLoading ? (
         <>
           {iconClass && <i className={iconClass}></i>}
