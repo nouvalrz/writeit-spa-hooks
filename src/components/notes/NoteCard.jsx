@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { showFormattedDate } from '../../utils';
 import Button from '../base/Button';
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 function NoteCard({
   id,
@@ -13,6 +14,8 @@ function NoteCard({
   onToggleNoteArchive,
   withButtons = true,
 }) {
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isArchiveLoading, setIsArchiveLoading] = useState(false);
   return (
     <div className="note-card">
       <Link className="note-card__title" to={`/note/${id}`}>
@@ -24,14 +27,24 @@ function NoteCard({
         <>
           <div className="note-card__actions">
             <Button
-              onClick={() => onToggleNoteArchive(id)}
+              onClick={() => {
+                setIsArchiveLoading(true);
+                onToggleNoteArchive(id);
+              }}
               className="note-card_archive-button"
               title={archived ? 'Unarchive' : 'Archive'}
+              isLoading={isArchiveLoading}
+              loadingColor="white"
             />
             <Button
-              onClick={() => onDeleteNote(id)}
+              onClick={() => {
+                setIsDeleteLoading(true);
+                onDeleteNote(id);
+              }}
               className="note-card_delete-button"
               iconClass="fa-regular fa-trash-can"
+              loadingColor="white"
+              isLoading={isDeleteLoading}
             />
           </div>
         </>
@@ -41,7 +54,7 @@ function NoteCard({
 }
 
 NoteCard.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   createdAt: PropTypes.string.isRequired,

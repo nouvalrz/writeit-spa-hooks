@@ -4,6 +4,8 @@ import TextArea from './forms/TextArea';
 import TextInput from './forms/TextInput';
 import autoBind from 'auto-bind';
 import PropTypes from 'prop-types';
+import SwalToast from '../utils/swal-toast';
+import withReactContent from 'sweetalert2-react-content';
 
 class AppNoteForm extends React.Component {
   constructor(props) {
@@ -13,6 +15,8 @@ class AppNoteForm extends React.Component {
       title: '',
       body: '',
     };
+
+    this.swalAlert = withReactContent(SwalToast);
 
     autoBind(this);
   }
@@ -43,7 +47,7 @@ class AppNoteForm extends React.Component {
     event.preventDefault();
 
     if (this.state.body === '' || this.state.title === '') {
-      alert('Fill all input');
+      this.swalAlert.fire({ title: 'Fill all input', icon: 'warning' });
       return;
     }
 
@@ -85,6 +89,7 @@ class AppNoteForm extends React.Component {
             title="Save"
             type="submit"
             className="app-note-form__button"
+            isLoading={this.props.isLoading}
           />
         </form>
       </div>
@@ -94,6 +99,7 @@ class AppNoteForm extends React.Component {
 
 AppNoteForm.propTypes = {
   onAddNote: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
 };
 
 export default AppNoteForm;

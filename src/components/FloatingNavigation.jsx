@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Button from './base/Button';
 
 function FloatingNavigation({ items }) {
   const navigate = useNavigate();
@@ -16,16 +17,17 @@ function FloatingNavigation({ items }) {
   return (
     <div className="floating-button">
       {items.map((item, index) => {
-        const { title, onClick, icon } = item;
+        const { title, onClick, icon, isLoading } = item;
         return (
           <React.Fragment key={index}>
-            <button
+            <Button
+              isLoading={isLoading}
               onClick={() => clickHandler(onClick)}
               className="floating-button__item"
-            >
-              {icon && <i className={icon}></i>}
-              <p>{title}</p>
-            </button>
+              iconClass={icon}
+              title={title}
+            />
+
             {index < items.length - 1 && <span>|</span>}
           </React.Fragment>
         );
